@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お問い合わせフォーム</title>
+  </head>
+  <body>
+    <h1>お問い合わせフォーム</h1>
+
+    <form id="contactForm" action="/index.php" method="post">
+      <label for="name">名前:</label><br />
+      <input type="text" id="name" name="name" /><br /><br />
+
+      <label for="email">メールアドレス:</label><br />
+      <input type="email" id="email" name="email" /><br /><br />
+
+      <label for="message">本文:</label><br />
+      <textarea id="message" name="message" rows="5" cols="30"></textarea
+      ><br /><br />
+
+      <button type="submit">送信</button>
+    </form>
+
+    <!-- 外部JavaScriptを読み込む -->
+    <script src="validate.js"></script>
+  </body>
+</html>
