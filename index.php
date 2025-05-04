@@ -1,15 +1,19 @@
 <?php
-// DB接続情報（Xserverで発行された情報に変更）
-$host = getenv('DB_HOST');
-$dbname = getenv('DB_NAME');
-$user = getenv('DB_USER');
-$pass = getenv('DB_PASS');
-$charset = 'utf8mb4';
-
 require_once 'vendor/autoload.php'; // Composer経由で導入した場合
 
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// DB接続情報（Xserverで発行された情報に変更）
+$host = $_SERVER['DB_HOST'];
+$dbname =  $_SERVER['DB_NAME'];
+$user =  $_SERVER['DB_USER'];
+$pass =  $_SERVER['DB_PASS'];
+$charset = 'utf8mb4';
+
 \Sentry\init([
-  'dsn' => getenv('SENTRY_DSN'),
+  'dsn' => $_SERVER['SENTRY_DSN'],
   // Add request headers, cookies and IP address,
   // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
   'send_default_pii' => true,
@@ -38,14 +42,14 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 		// echo $data;
-		not_a_function();
+		not_a_function4();
 
     // データ登録
     $stmt = $pdo->prepare("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)");
     $stmt->execute([$name, $email, $message]);
 
 		// ChatGPT API キー
-		// $apiKey = getenv('AI_key')
+		// $apiKey = $_SERVER['AI_key'];
 
 		// リクエスト用データ
 		// $data = [
@@ -144,7 +148,7 @@ try {
     echo json_encode([
         "status" => "error",
         "message" => "サーバーエラー: " . $e->getMessage(),
-        "sentry_event_id" => $eventId,
+        "sentry_event_id" => $eventId ? (string)$eventId : null,
         "sentry_message" => $e->getMessage(),
         "sentry_file" => $filePath,
         "sentry_line" => $e->getLine(),
