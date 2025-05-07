@@ -14,11 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) {
-      alert("有効なメールアドレスを入力してください。");
-      return;
-    }
+    const emailPattern = /@/;
+		if (!emailPattern.test(email)) {
+			alert("メールアドレスに@が含まれていません。");
+			return;
+		}
 
     // フォームデータ送信
     const formData = new FormData();
@@ -32,8 +32,13 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((res) => res.text())
       .then((text) => {
-        console.log("サーバーの応答:", text);
-        console.log(JSON.parse(text));
+        try {
+					const json = JSON.parse(text);
+					console.log(json)
+					document.getElementById("checkForm").style.display = "block";
+				} catch (e) {
+					console.error("JSONの解析に失敗しました:", e);
+				}
         // 必要に応じて DOM に反映させる
         // document.body.insertAdjacentHTML("beforeend", `<p>${text}</p>`);
       })
