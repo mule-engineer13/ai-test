@@ -13,6 +13,20 @@ $user =  $_SERVER['DB_USER'];
 $pass =  $_SERVER['DB_PASS'];
 $charset = 'utf8mb4';
 
+$request = $_POST;
+
+$path = __DIR__ .'/functions.php';
+$outputPath = __DIR__ . '/output.txt';
+
+// ファイル読み込み
+$code = file_get_contents($path);
+
+// エスケープ（< や & を安全に）
+$escaped = htmlspecialchars($code, ENT_QUOTES, 'UTF-8');
+
+// 書き出し
+file_put_contents($outputPath, $escaped);
+
 \Sentry\init([
   'dsn' => $_SERVER['SENTRY_DSN'],
   // Add request headers, cookies and IP address,
@@ -20,6 +34,11 @@ $charset = 'utf8mb4';
   'send_default_pii' => true,
 	'error_types' => E_ALL, // 全エラーを対象にする
 	'before_send' => function (\Sentry\Event $event, ?\Sentry\EventHint $hint) {
+			file_put_contents(
+					__DIR__ . '/debug_event_dump.txt',
+					print_r($event, true)
+			);
+
 			$data = [
 					'event_id'        => (string)$event->getId(),
 					'level'           => (string)$event->getLevel(),
@@ -119,6 +138,15 @@ $charset = 'utf8mb4';
 	}
 
 ]);
+
+\Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
+    $scope->setContext("request", [
+        "method" => $_SERVER['REQUEST_METHOD'],
+        "url" => $_SERVER['REQUEST_URI'],
+        "data" => $_POST, // 👈 ここでPOSTデータを追加
+    ]);
+});
+
 // フォーム値をサニタイズ
 $name = htmlspecialchars(trim($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8');
 $email = htmlspecialchars(trim($_POST['email'] ?? ''), ENT_QUOTES, 'UTF-8');
@@ -142,7 +170,7 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 		// echo $data;
-		$email = checkEmail($email);
+		$email = checkEmail($email)[0];
 
     // データ登録
     $stmt = $pdo->prepare("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)");
