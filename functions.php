@@ -1,5 +1,5 @@
 <?php
-function checkEmail(string $email): string
+function checkEmail(string $email)
 {
 		$error = null;
     // フォーマットチェック
@@ -15,5 +15,7 @@ function checkEmail(string $email): string
       $error = $content."を確認してください";
     }
 
-    return $email;
+		$returnArray = [$email,$error];
+
+    return $returnArray;
 }
